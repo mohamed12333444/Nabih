@@ -8,6 +8,14 @@ const errorRedirect = (path: string, message: string) => {
   redirect(`${path}?error=${encodeURIComponent(message)}`);
 };
 
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Unexpected authentication error.";
+};
+
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
@@ -16,11 +24,15 @@ export async function loginAction(formData: FormData) {
     errorRedirect("/login", "Email and password are required.");
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
-    errorRedirect("/login", error.message);
+    if (error) {
+      errorRedirect("/login", error.message);
+    }
+  } catch (error) {
+    errorRedirect("/login", getErrorMessage(error));
   }
 
   redirect("/dashboard");
@@ -39,19 +51,23 @@ export async function signupAction(formData: FormData) {
     errorRedirect("/signup", "Password must be at least 8 characters.");
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: fullName
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName
+        }
       }
-    }
-  });
+    });
 
-  if (error) {
-    errorRedirect("/signup", error.message);
+    if (error) {
+      errorRedirect("/signup", error.message);
+    }
+  } catch (error) {
+    errorRedirect("/signup", getErrorMessage(error));
   }
 
   redirect("/dashboard");
