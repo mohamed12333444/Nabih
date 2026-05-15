@@ -1,0 +1,18 @@
+{
+  "name": "Nabih AI SaaS",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "Nabih Next.js", "onAutoForward": "notify" }
+  },
+  "postCreateCommand": "npm install && npm run prepare",
+  "postStartCommand": "npm run dev",
+  "customizations": {
+    "vscode": {
+      "extensions": ["bradlc.vscode-tailwindcss", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "supabase.supabase"]
+    }
+  }
+}
